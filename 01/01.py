@@ -20,4 +20,4 @@ def add_fuel(mass):
 
 fuel = [add_fuel(fuel_i) for fuel_i in fuel]
 
-print(f"Total fuel required to return to Earth: {np.array(fuel).sum()}")
+print(f"Total fuel required to return to Earth: {sum(fuel)}")
