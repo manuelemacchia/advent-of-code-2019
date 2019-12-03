@@ -67,3 +67,25 @@ intersections = coordinate_intersection(coordinates[0], coordinates[1])
 distances = [distance(intersection, (0, 0)) for intersection in intersections]
 
 print(f"Minimum distance: {min(distances)}")
+
+# Part Two
+def distance_steps(wire_coords, point):
+    """Calculate the distance in steps for a wire to reach a point"""
+    dist = 0
+    for coord in wire_coords:
+        dist += 1
+
+        if coord == point:
+            break
+    
+    return dist
+
+combined = []
+for intersection in intersections:
+    s = 0
+    for wire_coords in coordinates:
+        s += distance_steps(wire_coords, intersection)
+    
+    combined.append(s)
+
+print(f"Minimum distance in steps: {min(combined)}")
