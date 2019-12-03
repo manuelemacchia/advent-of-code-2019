@@ -1,70 +1,43 @@
-import csv
-
 # Part One
-def distance(p, q):
-    """Calculate the Manhattan distance between two n-dimensional vectors"""
-    return sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
+directions = {
+    'x': {'U': 0, 'D': 0, 'L': -1, 'R': 1},
+    'y': {'U': 1, 'D': -1, 'L': 0, 'R': 0}
+}
 
 def occupied_coordinates(turns, start=(0, 0)):
     """Calculate coordinates occupied by a wire"""
-
     coords = [] # List of tuples (x, y)
-    current_state = start
+    pos = start
 
     for direction, length in turns:
-        if direction == 'U': # Up
-            for i in range(length):
-                coords.append((current_state[0], current_state[1] + i+1))
-            
-            current_state = (current_state[0], current_state[1] + length)
+        for i in range(1, length+1):
+            coords.append(((pos[0] + directions['x'][direction] * i), (pos[1] + directions['y'][direction] * i)))
 
-        if direction == 'D': # Down
-            for i in range(length):
-                coords.append((current_state[0], current_state[1] - (i+1)))
-            
-            current_state = (current_state[0], current_state[1] - length)
-        
-        if direction == 'L': # Left
-            for i in range(length):
-                coords.append((current_state[0] - (i+1), current_state[1]))
-            
-            current_state = (current_state[0] - length, current_state[1])
-
-        if direction == 'R': # Right
-            for i in range(length):
-                coords.append((current_state[0] + i+1, current_state[1]))
-            
-            current_state = (current_state[0] + length, current_state[1])
+        pos = (pos[0] + directions['x'][direction] * length), (pos[1] + directions['y'][direction] * length)
                 
     return coords
 
-# Input and preprocessing
+# Input
+import csv
+
 wires = []
 with open('input.txt', 'r') as f:
     reader = csv.reader(f, delimiter=',')
     for row in reader:
         wires.append(row)
 
-turns = []
-for wire in wires:
-    l = []
-    for turn in wire:
-        l.append((turn[0], int(turn[1:])))
-    
-    turns.append(l)
+# Store each turn that each wire makes as a tuple (direction, number of steps)
+wire_turns = [[(turn[0], int(turn[1:])) for turn in wire] for wire in wires]
 
-# Calculate coordinates occupied by each wire and store them in a list
-coordinates = []
-for i in range(len(wires)):
-    coordinates.append(occupied_coordinates(turns[i]))
+# Calculate coordinates occupied by each wire and store them in a set
+coordinates = [occupied_coordinates(wire_turns[i]) for i in range(len(wires))]
 
-def coordinate_intersection(wire1, wire2):
-    """Calculate intersections between two wires"""
-    return list(set(wire1).intersection(wire2))
+# Calculate the intersection between the two wires
+intersections = set(coordinates[0]).intersection(coordinates[1])
 
-intersections = coordinate_intersection(coordinates[0], coordinates[1])
-
-distances = [distance(intersection, (0, 0)) for intersection in intersections]
+# Calculate the Manhattan distance between each intersection and the center
+center = (0, 0)
+distances = [sum(abs(p_i - q_i) for p_i, q_i in zip(intersection, center)) for intersection in intersections]
 
 print(f"Minimum distance: {min(distances)}")
 
@@ -80,12 +53,6 @@ def distance_steps(wire_coords, point):
     
     return dist
 
-combined = []
-for intersection in intersections:
-    s = 0
-    for wire_coords in coordinates:
-        s += distance_steps(wire_coords, intersection)
-    
-    combined.append(s)
+combined = [sum([distance_steps(wire_coords, intersection) for wire_coords in coordinates]) for intersection in intersections]
 
 print(f"Minimum distance in steps: {min(combined)}")
