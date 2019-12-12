@@ -22,7 +22,7 @@ with open('input.txt', 'r') as f:
 # Program
 def run(program):
     # Load program into memory
-    p = program[:]
+    p = program
 
     pos = 0
     while p[pos] != STOP:
