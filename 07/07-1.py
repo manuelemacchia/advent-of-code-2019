@@ -1,5 +1,3 @@
-phase_setting = {x: int for x in range(0, 6)}
-
 import numpy as np
 from itertools import permutations
 
